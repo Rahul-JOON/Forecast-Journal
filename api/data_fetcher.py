@@ -1,22 +1,38 @@
 from dotenv import load_dotenv
 import os
 import requests
+from api.key_processor import load_location_keys
 
 # Load the API key from the .env file
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 
 
-def _12_hour_temperature_forecast(location_keys) -> None:
+def _12_hour_temperature_forecast(location_keys=load_location_keys()) -> dict:
     """
-    Fetches and prints 12-hour temperature forecast for the given locations.
+    Fetches the 12-hour temperature forecast for the given locations.
+    Returns the forecast data in JSON format.
+
+    Can be given a new set of location keys as a parameter; otherwise, it
+    uses the default location keys from location_keys.bin.
+
+    Return e.g {"Delhi": [{"DateTime": "2025-01-21T15:00:00+05:30",
+    "EpochDateTime": 1737451800, "WeatherIcon": 1, "IconPhrase": "Sunny",
+    "HasPrecipitation": false, "IsDaylight": true,
+    "Temperature": {"Value": 23.8, "Unit": "C", "UnitType": 17},
+    "PrecipitationProbability": 0,
+    "MobileLink": "http://www.accuweather.com/en/in/bahadurgarh/188460/hourly
+    -weather-forecast/188460?day=1&hbhhour=15&unit=c&lang=en-us",
+    "Link": "http://www.accuweather.com/en/in/bahadurgarh/188460/hourly
+    -weather-forecast/188460?day=1&hbhhour=15&unit=c&lang=en-us"}]
+    }
 
     Parameters:
         location_keys (dict): A dictionary where the key is the location name
         and the value is the location key.
         e.g. {"Dwarka": "123456", "Najafgarh": "789012", ...}
     """
-
+    json_response = {}
     for location in location_keys:
         location_key = location_keys[location]
         HOURLY_URL = (
@@ -31,11 +47,7 @@ def _12_hour_temperature_forecast(location_keys) -> None:
         forecast_response = requests.get(HOURLY_URL, params=forecast_params)
         if forecast_response.status_code == 200:
             forecast_data = forecast_response.json()
-            print(f"Location: {location}")
-            for hour in forecast_data:
-                time = hour["DateTime"]
-                temp = hour["Temperature"]["Value"]
-                condition = hour["IconPhrase"]
-                print(f"Time: {time}, Temp: {temp}°C, Condition: {condition}")
+            json_response[location] = forecast_data
         else:
             print("Error fetching forecast:", forecast_response.status_code)
+    return json_response

@@ -1,5 +1,4 @@
-from api.key_processor import load_location_keys
-from api.data_fetcher import _12_hour_temperature_forecast
+from scripts.populate import populate
 
 # Ececute only when need to update the keys
 """
@@ -11,5 +10,4 @@ locations = ["Dwarka", "Najafgarh", "Nawada", "Bahadurgarh"]
 update_keys(locations)
 """
 
-location_keys = load_location_keys()
-_12_hour_temperature_forecast(location_keys)
+populate()

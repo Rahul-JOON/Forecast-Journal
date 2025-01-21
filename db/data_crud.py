@@ -1,4 +1,4 @@
-from conn import ConnectionPool
+from db.conn import ConnectionPool
 
 # Create a connection pool
 cpool = ConnectionPool()
