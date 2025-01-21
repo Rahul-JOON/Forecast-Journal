@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 # Load .env file to get the connection string
 load_dotenv()
+trial_db, dev_db = os.getenv('DATABASE_URL_TRIAL'), os.getenv(
+    'DATABASE_URL_DEVELOPMENT')
 
 
 class ConnectionPool:
@@ -18,12 +20,13 @@ class ConnectionPool:
         - close_all_connections(none) -> closes all connections in the pool.
     """
 
-    def __init__(self, connection_string=os.getenv('DATABASE_URL'), min_conn=1,
+    def __init__(self, DB=0, min_conn=1,
                  max_conn=10) -> None:
         """
         Initializes the connection pool with the given connection string,
         minimum and maximum number of connections.
         """
+        connection_string = trial_db if DB == 0 else dev_db
         self.connection_pool = pool.SimpleConnectionPool(
             min_conn,  # Minimum number of connections in the pool
             max_conn,  # Maximum number of connections in the pool

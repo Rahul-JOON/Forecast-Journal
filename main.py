@@ -3,9 +3,11 @@ from api.data_fetcher import _12_hour_temperature_forecast
 
 # Ececute only when need to update the keys
 """
-# List of locations to get keys for"
 from scripts.key_updater import update_keys
+
+# List of locations to get keys for"
 locations = ["Dwarka", "Najafgarh", "Nawada", "Bahadurgarh"]
+
 update_keys(locations)
 """
 

@@ -1,0 +1,81 @@
+-- Table 1: locations
+-- This table stores information about different locations where temperature predictions are made.
+-- Columns:
+-- - location_id: A unique DB identifier for each location (auto-incremented).
+-- - location_name: A descriptive name for the location (e.g., city or region name).
+-- - unique_key: A string for external API mapping or cross-referencing.
+
+CREATE TABLE locations (
+    location_id SERIAL PRIMARY KEY,           -- Unique DB ID for the location.
+    location_name VARCHAR(255) NOT NULL,     -- Descriptive name of the location.
+    unique_key VARCHAR(255) UNIQUE NOT NULL  -- Unique API key for the location
+);
+-- Table: locations
+-- +-------------+----------------+------------+
+-- | location_id | location_name  | unique_key |
+-- +-------------+----------------+------------+
+-- | 1           | New York       | ny123      |
+-- | 2           | Los Angeles    | la456      |
+-- | 3           | Chicago        | ch789      |
+-- +-------------+----------------+------------+
+
+
+-- Table 2: temperature_predictions
+-- This table records the temperature forecasts for various locations at different times.
+-- Columns:
+-- - id: A unique identifier for each temperature prediction (auto-incremented).
+-- - location_id: A foreign key referencing the locations table, linking each prediction to a specific location.
+-- - forecast_for_hour: The hour for which the temperature is predicted.
+-- - forecast_made_at: The timestamp indicating when the forecast was generated.
+-- - temperature: The predicted temperature value (in degrees Celsius or Fahrenheit; mostly Celsius).
+
+CREATE TABLE temperature_predictions (
+    id SERIAL PRIMARY KEY,                     -- Unique ID for each temperature prediction.
+    location_id INT REFERENCES locations(location_id), -- Links prediction to a location.
+    forecast_for_hour TIMESTAMP NOT NULL,      -- Hour for which the temperature is predicted.
+    forecast_made_at TIMESTAMP NOT NULL,       -- Time the forecast was generated.
+    temperature FLOAT NOT NULL                 -- Predicted temperature value.
+);
+-- Table: temperature_predictions
+-- +----+-------------+---------------------+---------------------+-------------+
+-- | id | location_id | forecast_for_hour  | forecast_made_at    | temperature |
+-- +----+-------------+---------------------+---------------------+-------------+
+-- | 1  | 1           | 2025-01-21 15:00:00| 2025-01-21 12:00:00 | 5.6         |
+-- | 2  | 1           | 2025-01-21 16:00:00| 2025-01-21 12:00:00 | 6.1         |
+-- | 3  | 2           | 2025-01-21 15:00:00| 2025-01-21 11:00:00 | 18.4        |
+-- | 4  | 3           | 2025-01-21 17:00:00| 2025-01-21 13:00:00 | -2.3        |
+-- +----+-------------+---------------------+---------------------+-------------+
+
+
+-- Index: idx_forecast
+-- This index optimizes query performance for retrieving temperature predictions based on location, the hour forecasted,
+    and the time the forecast was made.
+-- It helps speed up queries that filter or sort data on these columns.
+CREATE INDEX idx_forecast 
+ON temperature_predictions(location_id, forecast_for_hour, forecast_made_at);
+
+
+-- Illustration of Data Flow:
+-- Step 1: Insert a new location into the locations table.
+-- Example:
+-- INSERT INTO locations (location_name, unique_key) 
+-- VALUES ('New York', 'ny123');
+
+-- Step 2: Insert temperature predictions linked to the location.
+-- Example:
+-- INSERT INTO temperature_predictions (location_id, forecast_for_hour, forecast_made_at, temperature)
+-- VALUES (1, '2025-01-21 15:00:00', '2025-01-21 12:00:00', 5.6);
+
+-- Step 3: Retrieve predictions efficiently using the index.
+-- Example Query:
+-- SELECT *
+-- FROM temperature_predictions
+-- WHERE location_id = 1 
+--   AND forecast_for_hour = '2025-01-21 15:00:00';
+
+-- Key Concepts:
+-- 1. Foreign Key Constraint: Ensures that temperature predictions always reference a valid location.
+-- 2. Indexing: Speeds up queries, especially when dealing with large datasets.
+-- 3. Data Normalization: Separates locations and predictions into two tables, reducing redundancy.
+-- 4. Timestamps: Provide precise data points for temporal queries and analysis.
+-- 5. Unique Key: Allows integration with external systems without confusion over location identity.
