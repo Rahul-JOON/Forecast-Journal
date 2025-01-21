@@ -1,11 +1,15 @@
-from dotenv import load_dotenv
-import os
-from key_processing import load_location_keys
-from data_fetcher import _12_hour_temperature_forecast
+from api.key_processor import load_location_keys
+from api.data_fetcher import _12_hour_temperature_forecast
 
-load_dotenv()
+# Ececute only when need to update the keys
+"""
+from scripts.key_updater import update_keys
 
-API_KEY = os.getenv("API_KEY")
+# List of locations to get keys for"
+locations = ["Dwarka", "Najafgarh", "Nawada", "Bahadurgarh"]
+
+update_keys(locations)
+"""
 
 location_keys = load_location_keys()
 _12_hour_temperature_forecast(location_keys)
