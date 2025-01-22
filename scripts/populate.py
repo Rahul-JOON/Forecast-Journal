@@ -36,18 +36,19 @@ def populate(DB=0):
             data = (("(location_name, unique_key)"),
                     (location, location_keys[location]))
             if insert_data("locations", data):
-                # Log Status
-                status = "Success"
-                error_message = ""
                 print("Data inserted successfully.")
             else:
-                # Log Status and error message
-                status = "Failed"
-                error_message = "Error inserting data."
                 print("Error inserting data.")
 
-            # Log the transaction
-            log_db_transaction("insert", "locations", status, error_message)
+            """
+            Location db transactions are not logged for less complexity
+            and space constraints.
+            Each table will require a separate log table.
+            Or
+            A common log table will need to have something called as
+            PolyMorphic Relationships.
+            To avoid this, only the temperature_predictions table is logged.
+            """
 
     # Transform the forecast data into a db-friendly format
     db_format_data = _12_hour_forecast_data_db_format_transformation(json_data)
@@ -77,7 +78,6 @@ def populate(DB=0):
             print("Error inserting data.")
 
         # Log the transaction
-        log_db_transaction("insert", "temperature_predictions", status,
-                           error_message)
+        log_db_transaction("insert", status, error_message)
 
     return True

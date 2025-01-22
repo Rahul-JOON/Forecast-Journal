@@ -62,7 +62,6 @@ ON temperature_predictions(location_id, forecast_for_hour, forecast_made_at);
 -- - id: A foreign key linking to the temperature_predictions table.
 -- - timestamp: The time when the operation was logged (defaults to the current time).
 -- - operation_type: The type of operation performed (e.g., INSERT, UPDATE, DELETE).
--- - table_name: The name of the table affected by the operation.
 -- - status: The status of the operation (e.g., SUCCESS, FAILED).
 -- - error_message: Details about errors encountered during the operation (if any).
 -- - populate_id: Links the log to a specific population process.
@@ -71,7 +70,6 @@ CREATE TABLE db_transaction_logs (
     id INT REFERENCES temperature_predictions(id),    -- Links the log to a temperature prediction.
     timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the operation.
     operation_type VARCHAR(20) NOT NULL,              -- Type of operation performed.
-    table_name TEXT NOT NULL,                         -- Name of the affected table.
     status VARCHAR(10) NOT NULL,                      -- Status of the operation.
     error_message TEXT,                               -- Error details, if any.
     populate_id INT REFERENCES populate_logs(populate_id) -- Links the log to a specific population process.
@@ -79,12 +77,12 @@ CREATE TABLE db_transaction_logs (
 
 -- Dummy Data for Illustration
 -- Table: db_transaction_logs
--- +--------+----+-----------------------------+---------------+-------------------------+---------+---------------------------+--------------+
--- | log_id | id | timestamp                   | operation_type| table_name              | status  | error_message             | populate_id  |
--- +--------+----+-----------------------------+---------------+-------------------------+---------+---------------------------+--------------+
--- | 1      | 1  | 2025-01-21 12:01:00         | INSERT        | temperature_predictions | SUCCESS | NULL                      | 1            |
--- | 2      | 2  | 2025-01-21 12:05:00         | UPDATE        | temperature_predictions | FAILED  | "Constraint violation."   | 2            |
--- +--------+----+-----------------------------+---------------+-------------------------+---------+---------------------------+--------------+
+-- +--------+----+-----------------------------+---------------+---------+---------------------------+--------------+
+-- | log_id | id | timestamp                   | operation_type| status  | error_message             | populate_id  |
+-- +--------+----+-----------------------------+---------------+---------+---------------------------+--------------+
+-- | 1      | 1  | 2025-01-21 12:01:00         | INSERT        | SUCCESS | NULL                      | 1            |
+-- | 2      | 2  | 2025-01-21 12:05:00         | UPDATE        | FAILED  | "Constraint violation."   | 2            |
+-- +--------+----+-----------------------------+---------------+---------+---------------------------+--------------+
 
 -- Table 4: api_logs
 -- This table logs API interactions, providing a record of requests and responses for debugging and monitoring.
