@@ -3,9 +3,20 @@ from utils.transformation import (
     _12_hour_forecast_data_db_format_transformation)
 from db.data_crud import row_existence_check, insert_data
 from api.key_processor import load_location_keys
+from utils.logging import log_db_transaction
 
 
 def populate(DB=0):
+
+    # Start Populate transaction
+    data = (("""(status, error_message)""", ("Pending", "")))
+    insert_data("populate_logs", data)
+    """
+    If the process is completed without any errors
+    the function returns True, otherwise False.
+
+    Status and error messages are updated outside the function.
+    """
 
     # Fetch the forecast data from the API
     # default location argument i.e bin file location keys
@@ -29,6 +40,16 @@ def populate(DB=0):
             else:
                 print("Error inserting data.")
 
+            """
+            Location db transactions are not logged for less complexity
+            and space constraints.
+            Each table will require a separate log table.
+            Or
+            A common log table will need to have something called as
+            PolyMorphic Relationships.
+            To avoid this, only the temperature_predictions table is logged.
+            """
+
     # Transform the forecast data into a db-friendly format
     db_format_data = _12_hour_forecast_data_db_format_transformation(json_data)
 
@@ -47,6 +68,16 @@ def populate(DB=0):
 
         # Insert the data into the database
         if insert_data("temperature_predictions", data):
+            # Log Status
+            status = "Success"
+            error_message = ""
             print("Data inserted successfully.")
         else:
+            status = "Failed"
+            error_message = "Error inserting data."
             print("Error inserting data.")
+
+        # Log the transaction
+        log_db_transaction("insert", status, error_message)
+
+    return True

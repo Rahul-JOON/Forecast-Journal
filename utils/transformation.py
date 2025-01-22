@@ -1,6 +1,6 @@
 import datetime
 from api.key_processor import load_location_keys
-from db.data_crud import get_location_id
+from db.data_crud import get_value_single_where
 
 
 def _12_hour_forecast_data_db_format_transformation(json_data: dict) -> dict:
@@ -20,7 +20,8 @@ def _12_hour_forecast_data_db_format_transformation(json_data: dict) -> dict:
     nice_format_data = {}
     location_keys = load_location_keys()
     for location in json_data:
-        location_id = get_location_id(location)
+        location_id = get_value_single_where("locations", "location_id",
+                                             location, "location_name")
         currtime = datetime.datetime.now().isoformat()
         forecast_data = json_data[location]
         nice_format_data[location] = []
