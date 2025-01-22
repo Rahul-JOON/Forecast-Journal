@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 import requests
 from api.key_processor import load_location_keys
+from utils.logging import log_api_interaction
 
 # Load the API key from the .env file
 load_dotenv()
@@ -32,7 +33,11 @@ def _12_hour_temperature_forecast(location_keys=load_location_keys()) -> dict:
         and the value is the location key.
         e.g. {"Dwarka": "123456", "Najafgarh": "789012", ...}
     """
+    # Final JSON response
     json_response = {}
+
+    # Log Error Message
+    error_message = ""
     for location in location_keys:
         location_key = location_keys[location]
         HOURLY_URL = (
@@ -49,5 +54,12 @@ def _12_hour_temperature_forecast(location_keys=load_location_keys()) -> dict:
             forecast_data = forecast_response.json()
             json_response[location] = forecast_data
         else:
+            error_message = (
+                f"Error fetching forecast: {forecast_response.status_code}"
+                )
             print("Error fetching forecast:", forecast_response.status_code)
+
+        # Log the API interaction details
+        log_api_interaction(HOURLY_URL, "GET",
+                            forecast_response.status_code, error_message)
     return json_response

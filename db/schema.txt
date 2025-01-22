@@ -38,12 +38,12 @@ CREATE TABLE temperature_predictions (
 );
 -- Table: temperature_predictions
 -- +----+-------------+---------------------+---------------------+-------------+
--- | id | location_id | forecast_for_hour  | forecast_made_at    | temperature |
+-- | id | location_id | forecast_for_hour  | forecast_made_at     | temperature |
 -- +----+-------------+---------------------+---------------------+-------------+
--- | 1  | 1           | 2025-01-21 15:00:00| 2025-01-21 12:00:00 | 5.6         |
--- | 2  | 1           | 2025-01-21 16:00:00| 2025-01-21 12:00:00 | 6.1         |
--- | 3  | 2           | 2025-01-21 15:00:00| 2025-01-21 11:00:00 | 18.4        |
--- | 4  | 3           | 2025-01-21 17:00:00| 2025-01-21 13:00:00 | -2.3        |
+-- | 1  | 1           | 2025-01-21 15:00:00| 2025-01-21 12:00:00  | 5.6         |
+-- | 2  | 1           | 2025-01-21 16:00:00| 2025-01-21 12:00:00  | 6.1         |
+-- | 3  | 2           | 2025-01-21 15:00:00| 2025-01-21 11:00:00  | 18.4        |
+-- | 4  | 3           | 2025-01-21 17:00:00| 2025-01-21 13:00:00  | -2.3        |
 -- +----+-------------+---------------------+---------------------+-------------+
 
 
@@ -53,6 +53,91 @@ CREATE TABLE temperature_predictions (
 -- It helps speed up queries that filter or sort data on these columns.
 CREATE INDEX idx_forecast 
 ON temperature_predictions(location_id, forecast_for_hour, forecast_made_at);
+
+
+-- Table 3: db_transaction_logs
+-- This table logs database operations for temperature predictions, useful for tracking and debugging.
+-- Columns:
+-- - log_id: A unique identifier for each log entry (auto-incremented).
+-- - id: A foreign key linking to the temperature_predictions table.
+-- - timestamp: The time when the operation was logged (defaults to the current time).
+-- - operation_type: The type of operation performed (e.g., INSERT, UPDATE, DELETE).
+-- - table_name: The name of the table affected by the operation.
+-- - status: The status of the operation (e.g., SUCCESS, FAILED).
+-- - error_message: Details about errors encountered during the operation (if any).
+-- - populate_id: Links the log to a specific population process.
+CREATE TABLE db_transaction_logs (
+    log_id SERIAL PRIMARY KEY,                         -- Unique ID for each log entry.
+    id INT REFERENCES temperature_predictions(id),    -- Links the log to a temperature prediction.
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the operation.
+    operation_type VARCHAR(20) NOT NULL,              -- Type of operation performed.
+    table_name TEXT NOT NULL,                         -- Name of the affected table.
+    status VARCHAR(10) NOT NULL,                      -- Status of the operation.
+    error_message TEXT,                               -- Error details, if any.
+    populate_id INT REFERENCES populate_logs(populate_id) -- Links the log to a specific population process.
+);
+
+-- Dummy Data for Illustration
+-- Table: db_transaction_logs
+-- +--------+----+-----------------------------+---------------+-------------------------+---------+---------------------------+--------------+
+-- | log_id | id | timestamp                   | operation_type| table_name              | status  | error_message             | populate_id  |
+-- +--------+----+-----------------------------+---------------+-------------------------+---------+---------------------------+--------------+
+-- | 1      | 1  | 2025-01-21 12:01:00         | INSERT        | temperature_predictions | SUCCESS | NULL                      | 1            |
+-- | 2      | 2  | 2025-01-21 12:05:00         | UPDATE        | temperature_predictions | FAILED  | "Constraint violation."   | 2            |
+-- +--------+----+-----------------------------+---------------+-------------------------+---------+---------------------------+--------------+
+
+-- Table 4: api_logs
+-- This table logs API interactions, providing a record of requests and responses for debugging and monitoring.
+-- Columns:
+-- - log_id: A unique identifier for each API log entry (auto-incremented).
+-- - timestamp: The time when the API interaction occurred (defaults to the current time).
+-- - request_url: The URL accessed during the API interaction.
+-- - request_method: The HTTP method used (e.g., GET, POST).
+-- - response_status: The HTTP status code returned by the API.
+-- - error_message: Details about errors encountered during the API interaction (if any).
+-- - populate_id: Links the API log to a specific population process.
+CREATE TABLE api_logs (
+    log_id SERIAL PRIMARY KEY,                           -- Unique ID for each API log entry.
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,    -- Timestamp of the API interaction.
+    request_url TEXT NOT NULL,                          -- URL of the API endpoint accessed.
+    request_method VARCHAR(10) NOT NULL,               -- HTTP method used for the request.
+    response_status INTEGER,                            -- HTTP status code returned by the API.
+    error_message TEXT,                                 -- Error details, if any.
+    populate_id INT REFERENCES populate_logs(populate_id) -- Links the API log to a specific population process.
+);
+
+-- Dummy Data for Illustration
+-- Table: api_logs
+-- +--------+-----------------------------+-----------------------+---------------+----------------+-------------------------+--------------+
+-- | log_id | timestamp                   | request_url           | request_method| response_status| error_message           | populate_id  |
+-- +--------+-----------------------------+-----------------------+---------------+----------------+-------------------------+--------------+
+-- | 1      | 2025-01-21 12:10:00         | /api/forecast         | GET           | 200            | NULL                    | 1            |
+-- | 2      | 2025-01-21 12:12:00         | /api/forecast         | POST          | 500            | "Internal Server Error" | 2            |
+-- +--------+-----------------------------+-----------------------+---------------+----------------+-------------------------+--------------+
+
+
+-- Table 5: populate_logs
+-- This table logs the status of population scripts or processes, used to track data ingestion or seeding events.
+-- Columns:
+-- - populate_id: A unique identifier for each log entry (auto-incremented).
+-- - timestamp: The time when the population process was logged (defaults to the current time).
+-- - status: The status of the population process (e.g., SUCCESS, FAILED).
+-- - error_message: Details about errors encountered during the process (if any).
+CREATE TABLE populate_logs (
+    populate_id SERIAL PRIMARY KEY,                     -- Unique ID for each population log entry.
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,   -- Timestamp of the population process.
+    status VARCHAR(10) NOT NULL,                       -- Status of the process.
+    error_message TEXT                                 -- Error details, if any.
+);
+
+-- Dummy Data for Illustration
+-- Table: populate_logs
+-- +-------------+-----------------------------+---------+---------------------------+
+-- | populate_id | timestamp                   | status  | error_message             |
+-- +-------------+-----------------------------+---------+---------------------------+
+-- | 1           | 2025-01-21 13:00:00         | SUCCESS | NULL                      |
+-- | 2           | 2025-01-21 13:05:00         | FAILED  | "Connection timeout."     |
+-- +-------------+-----------------------------+---------+---------------------------+
 
 
 -- Illustration of Data Flow:
