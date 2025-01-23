@@ -1,20 +1,20 @@
-name: Forecast Logging (main.py exec)
+name: Forecast Logging (2 Hour Interval)
 
 on:
   schedule:
-    - cron: "0 */2 * * *" # Runs every 2 hours
-  push:
-    branches:
-      - main # Ensures it only triggers for this branch
+    - cron: '0 */2 * * *' # Runs every 2 hours
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
 
     steps:
+
       # Checkout the repository
-      - name: Checkout repository
+      - name: Git checkout
         uses: actions/checkout@v3
+        with: { ref: main }
 
       # Set up Python environment
       - name: Set up Python
@@ -28,13 +28,11 @@ jobs:
           pip install -r requirements.txt
 
       # Run main.py with secrets
-      - name: Run main.py
+      - name: Run fetch_forecast.py
         env:
           API_KEY: ${{ secrets.API_KEY }}
           DATABASE_URL_DEVELOPMENT: ${{ secrets.DATABASE_URL_DEVELOPMENT }}
           DATABASE_URL_MAIN: ${{ secrets.DATABASE_URL_MAIN }}
           DATABASE_URL_TRIAL: ${{ secrets.DATABASE_URL_TRIAL }}
-          DATABASE_URL_MASTER: ${{ secrets.DATABASE_URL_MASTER }}
-          DATABASE_URL_FEBRUARY_2025: ${{ secrets.DATABASE_URL_FEBRUARY_2025 }}
         run: |
-          python main.py
+          python fetch_forecast.py
