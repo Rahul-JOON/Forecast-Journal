@@ -1,8 +1,8 @@
-name: Alpha Testing every hour interval
+name: Alpha Testing every alternate hour interval
 
 on:
   schedule:
-    - cron: '0 */1 * * *' # Runs every hour
+    - cron: '0 */2 * * *' # Runs every 2 hours
   workflow_dispatch:
 
 jobs:
