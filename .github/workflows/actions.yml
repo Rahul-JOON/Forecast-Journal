@@ -34,5 +34,7 @@ jobs:
           DATABASE_URL_DEVELOPMENT: ${{ secrets.DATABASE_URL_DEVELOPMENT }}
           DATABASE_URL_MAIN: ${{ secrets.DATABASE_URL_MAIN }}
           DATABASE_URL_TRIAL: ${{ secrets.DATABASE_URL_TRIAL }}
+          DATABASE_URL_FEBRUARY_2025: ${{ secrets.DATABASE_URL_FEBRUARY_2025 }}
+          DATABASE_URL_MASTER: ${{ secrets.DATABASE_URL_MASTER }}
         run: |
           python fetch_forecast.py

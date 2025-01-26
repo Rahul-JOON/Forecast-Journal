@@ -47,9 +47,9 @@ Develop a machine learning model to:
 
 ## Documentation
 Well-documented guides about the database schema, API usage, and scripts can be found in their respective folders:
-- [API Documentation](./API/readme.md)
-- [Database Documentation](./db/readme.md)
-- [Scripts Documentation](./scripts/readme.md)
+- [API Documentation](./API/README.md)
+- [Database Documentation](./db/README.md)
+- [Scripts Documentation](./scripts/README.md)
 
 ---
 
