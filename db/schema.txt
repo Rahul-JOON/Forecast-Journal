@@ -1,0 +1,164 @@
+-- Table 1: locations
+-- This table stores information about different locations where temperature predictions are made.
+-- Columns:
+-- - location_id: A unique DB identifier for each location (auto-incremented).
+-- - location_name: A descriptive name for the location (e.g., city or region name).
+-- - unique_key: A string for external API mapping or cross-referencing.
+
+CREATE TABLE locations (
+    location_id SERIAL PRIMARY KEY,           -- Unique DB ID for the location.
+    location_name VARCHAR(255) NOT NULL,     -- Descriptive name of the location.
+    unique_key VARCHAR(255) UNIQUE NOT NULL  -- Unique API key for the location
+);
+-- Table: locations
+-- +-------------+----------------+------------+
+-- | location_id | location_name  | unique_key |
+-- +-------------+----------------+------------+
+-- | 1           | New York       | ny123      |
+-- | 2           | Los Angeles    | la456      |
+-- | 3           | Chicago        | ch789      |
+-- +-------------+----------------+------------+
+
+
+-- Table 2: temperature_predictions
+-- This table records the temperature forecasts for various locations at different times.
+-- Columns:
+-- - id: A unique identifier for each temperature prediction (auto-incremented).
+-- - location_id: A foreign key referencing the locations table, linking each prediction to a specific location.
+-- - forecast_for_hour: The hour for which the temperature is predicted.
+-- - forecast_made_at: The timestamp indicating when the forecast was generated.
+-- - temperature: The predicted temperature value (in degrees Celsius or Fahrenheit; mostly Celsius).
+
+CREATE TABLE temperature_predictions (
+    id SERIAL PRIMARY KEY,                     -- Unique ID for each temperature prediction.
+    location_id INT REFERENCES locations(location_id), -- Links prediction to a location.
+    forecast_for_hour TIMESTAMP NOT NULL,      -- Hour for which the temperature is predicted.
+    forecast_made_at TIMESTAMP NOT NULL,       -- Time the forecast was generated.
+    temperature FLOAT NOT NULL                 -- Predicted temperature value.
+);
+-- Table: temperature_predictions
+-- +----+-------------+---------------------+---------------------+-------------+
+-- | id | location_id | forecast_for_hour  | forecast_made_at     | temperature |
+-- +----+-------------+---------------------+---------------------+-------------+
+-- | 1  | 1           | 2025-01-21 15:00:00| 2025-01-21 12:00:00  | 5.6         |
+-- | 2  | 1           | 2025-01-21 16:00:00| 2025-01-21 12:00:00  | 6.1         |
+-- | 3  | 2           | 2025-01-21 15:00:00| 2025-01-21 11:00:00  | 18.4        |
+-- | 4  | 3           | 2025-01-21 17:00:00| 2025-01-21 13:00:00  | -2.3        |
+-- +----+-------------+---------------------+---------------------+-------------+
+
+
+-- Index: idx_forecast
+-- This index optimizes query performance for retrieving temperature predictions based on location, the hour forecasted,
+    and the time the forecast was made.
+-- It helps speed up queries that filter or sort data on these columns.
+CREATE INDEX idx_forecast 
+ON temperature_predictions(location_id, forecast_for_hour, forecast_made_at);
+
+
+-- Table 3: db_transaction_logs
+-- This table logs database operations for temperature predictions, useful for tracking and debugging.
+-- Columns:
+-- - log_id: A unique identifier for each log entry (auto-incremented).
+-- - id: A foreign key linking to the temperature_predictions table.
+-- - timestamp: The time when the operation was logged (saved as utc natively by neon; displayed in the timezone set by user).
+-- - operation_type: The type of operation performed (e.g., INSERT, UPDATE, DELETE).
+-- - status: The status of the operation (e.g., SUCCESS, FAILED).
+-- - error_message: Details about errors encountered during the operation (if any).
+-- - populate_id: Links the log to a specific population process.
+CREATE TABLE db_transaction_logs (
+    log_id SERIAL PRIMARY KEY,                         -- Unique ID for each log entry.
+    id INT REFERENCES temperature_predictions(id),    -- Links the log to a temperature prediction.
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,  -- Timestamp of the operation.
+    operation_type VARCHAR(20) NOT NULL,              -- Type of operation performed.
+    status VARCHAR(10) NOT NULL,                      -- Status of the operation.
+    error_message TEXT,                               -- Error details, if any.
+    populate_id INT REFERENCES populate_logs(populate_id) -- Links the log to a specific population process.
+);
+
+-- Dummy Data for Illustration
+-- Table: db_transaction_logs
+-- +--------+----+-----------------------------+---------------+---------+---------------------------+--------------+
+-- | log_id | id | timestamp                   | operation_type| status  | error_message             | populate_id  |
+-- +--------+----+-----------------------------+---------------+---------+---------------------------+--------------+
+-- | 1      | 1  | 2025-01-21 12:01:00         | INSERT        | SUCCESS | NULL                      | 1            |
+-- | 2      | 2  | 2025-01-21 12:05:00         | UPDATE        | FAILED  | "Constraint violation."   | 2            |
+-- +--------+----+-----------------------------+---------------+---------+---------------------------+--------------+
+
+-- Table 4: api_logs
+-- This table logs API interactions, providing a record of requests and responses for debugging and monitoring.
+-- Columns:
+-- - log_id: A unique identifier for each API log entry (auto-incremented).
+-- - timestamp: The time when the API interaction occurred (saved as utc natively by neon; displayed in the timezone set by user).
+-- - request_url: The URL accessed during the API interaction.
+-- - request_method: The HTTP method used (e.g., GET, POST).
+-- - response_status: The HTTP status code returned by the API.
+-- - error_message: Details about errors encountered during the API interaction (if any).
+-- - populate_id: Links the API log to a specific population process.
+CREATE TABLE api_logs (
+    log_id SERIAL PRIMARY KEY,                           -- Unique ID for each API log entry.
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,    -- Timestamp of the API interaction.
+    request_url TEXT NOT NULL,                          -- URL of the API endpoint accessed.
+    request_method VARCHAR(10) NOT NULL,               -- HTTP method used for the request.
+    response_status INTEGER,                            -- HTTP status code returned by the API.
+    error_message TEXT,                                 -- Error details, if any.
+    populate_id INT REFERENCES populate_logs(populate_id) -- Links the API log to a specific population process.
+);
+
+-- Dummy Data for Illustration
+-- Table: api_logs
+-- +--------+-----------------------------+-----------------------+---------------+----------------+-------------------------+--------------+
+-- | log_id | timestamp                   | request_url           | request_method| response_status| error_message           | populate_id  |
+-- +--------+-----------------------------+-----------------------+---------------+----------------+-------------------------+--------------+
+-- | 1      | 2025-01-21 12:10:00         | /api/forecast         | GET           | 200            | NULL                    | 1            |
+-- | 2      | 2025-01-21 12:12:00         | /api/forecast         | POST          | 500            | "Internal Server Error" | 2            |
+-- +--------+-----------------------------+-----------------------+---------------+----------------+-------------------------+--------------+
+
+
+-- Table 5: populate_logs
+-- This table logs the status of population scripts or processes, used to track data ingestion or seeding events.
+-- Columns:
+-- - populate_id: A unique identifier for each log entry (auto-incremented).
+-- - timestamp: The time when the population process was logged (saved as utc natively by neon; displayed in the timezone set by user).
+-- - status: The status of the population process (e.g., SUCCESS, FAILED).
+-- - error_message: Details about errors encountered during the process (if any).
+CREATE TABLE populate_logs (
+    populate_id SERIAL PRIMARY KEY,                     -- Unique ID for each population log entry.
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,   -- Timestamp of the population process.
+    status VARCHAR(10) NOT NULL,                       -- Status of the process.
+    error_message TEXT                                 -- Error details, if any.
+);
+
+-- Dummy Data for Illustration
+-- Table: populate_logs
+-- +-------------+-----------------------------+---------+---------------------------+
+-- | populate_id | timestamp                   | status  | error_message             |
+-- +-------------+-----------------------------+---------+---------------------------+
+-- | 1           | 2025-01-21 13:00:00         | SUCCESS | NULL                      |
+-- | 2           | 2025-01-21 13:05:00         | FAILED  | "Connection timeout."     |
+-- +-------------+-----------------------------+---------+---------------------------+
+
+
+-- Illustration of Data Flow:
+-- Step 1: Insert a new location into the locations table.
+-- Example:
+-- INSERT INTO locations (location_name, unique_key) 
+-- VALUES ('New York', 'ny123');
+
+-- Step 2: Insert temperature predictions linked to the location.
+-- Example:
+-- INSERT INTO temperature_predictions (location_id, forecast_for_hour, forecast_made_at, temperature)
+-- VALUES (1, '2025-01-21 15:00:00', '2025-01-21 12:00:00', 5.6);
+
+-- Step 3: Retrieve predictions efficiently using the index.
+-- Example Query:
+-- SELECT *
+-- FROM temperature_predictions
+-- WHERE location_id = 1 
+--   AND forecast_for_hour = '2025-01-21 15:00:00';
+
+-- Key Concepts:
+-- 1. Foreign Key Constraint: Ensures that temperature predictions always reference a valid location.
+-- 2. Indexing: Speeds up queries, especially when dealing with large datasets.
+-- 3. Data Normalization: Separates locations and predictions into two tables, reducing redundancy.
+-- 4. Timestamps: Provide precise data points for temporal queries and analysis.
+-- 5. Unique Key: Allows integration with external systems without confusion over location identity.
