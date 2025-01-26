@@ -2,10 +2,15 @@ import pickle
 from dotenv import load_dotenv
 import os
 import requests
+from utils.logging import log_api_interaction
 
-# Load the API key from the .env file
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
+# Load the API key from the .env file or the github actions secrets
+try:
+    load_dotenv()
+    API_KEY = os.getenv("API_KEY")
+except Exception as e:
+    API_KEY = os.environ("API_KEY")
+    error_message = f"Error loading API key: {str(e)}"
 
 
 def get_location_keys(locations) -> dict:
@@ -21,6 +26,9 @@ def get_location_keys(locations) -> dict:
         the location key.
         e.g. {"Dwarka": "123456", "Najafgarh": "789012", ...}
     """
+    # Log Error Message
+    error_message = ""
+
     location_keys = {}
     LOCATION_URL = (
         "http://dataservice.accuweather.com/locations/v1/cities/search"
@@ -36,9 +44,16 @@ def get_location_keys(locations) -> dict:
             # storing location data in a dictionary
             location_keys[LOCATION] = location_key
         else:
+            error_message = (
+                f"Error fetching location key: {location_response.status_code}"
+                )
             print("Error fetching location key:",
                   location_response.status_code)
             exit()
+
+        # Log the API interaction details
+        log_api_interaction(LOCATION_URL, "GET",
+                            location_response.status_code, error_message)
     return location_keys
 
 

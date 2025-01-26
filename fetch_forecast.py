@@ -6,7 +6,7 @@ from db.data_crud import update_row_single_where, last_insert_id
 from scripts.key_updater import update_keys
 
 # List of locations to get keys for"
-locations = ["Dwarka", "Najafgarh", "Nawada", "Bahadurgarh"]
+locations = ["Dwarka", "Najafgarh", "Hauz Khas", "Bahadurgarh"]
 
 update_keys(locations)
 """

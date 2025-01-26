@@ -60,7 +60,7 @@ def populate(DB=0):
 
         # Query tuple for inserting data into the database
         # The first element is the column names
-        data = (("""(location_id, forecast_for_hour, forecast_made_at,
+        data = (("""(location_id, forecast_made_at, forecast_for_hour,
                  temperature)"""),)
         # Append the data to the query tuple
         for i in db_format_data[location]:

@@ -60,7 +60,7 @@ ON temperature_predictions(location_id, forecast_for_hour, forecast_made_at);
 -- Columns:
 -- - log_id: A unique identifier for each log entry (auto-incremented).
 -- - id: A foreign key linking to the temperature_predictions table.
--- - timestamp: The time when the operation was logged (defaults to the current time).
+-- - timestamp: The time when the operation was logged (saved as utc natively by neon; displayed in the timezone set by user).
 -- - operation_type: The type of operation performed (e.g., INSERT, UPDATE, DELETE).
 -- - status: The status of the operation (e.g., SUCCESS, FAILED).
 -- - error_message: Details about errors encountered during the operation (if any).
@@ -88,7 +88,7 @@ CREATE TABLE db_transaction_logs (
 -- This table logs API interactions, providing a record of requests and responses for debugging and monitoring.
 -- Columns:
 -- - log_id: A unique identifier for each API log entry (auto-incremented).
--- - timestamp: The time when the API interaction occurred (defaults to the current time).
+-- - timestamp: The time when the API interaction occurred (saved as utc natively by neon; displayed in the timezone set by user).
 -- - request_url: The URL accessed during the API interaction.
 -- - request_method: The HTTP method used (e.g., GET, POST).
 -- - response_status: The HTTP status code returned by the API.
@@ -118,7 +118,7 @@ CREATE TABLE api_logs (
 -- This table logs the status of population scripts or processes, used to track data ingestion or seeding events.
 -- Columns:
 -- - populate_id: A unique identifier for each log entry (auto-incremented).
--- - timestamp: The time when the population process was logged (defaults to the current time).
+-- - timestamp: The time when the population process was logged (saved as utc natively by neon; displayed in the timezone set by user).
 -- - status: The status of the population process (e.g., SUCCESS, FAILED).
 -- - error_message: Details about errors encountered during the process (if any).
 CREATE TABLE populate_logs (

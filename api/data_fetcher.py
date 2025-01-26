@@ -4,9 +4,13 @@ import requests
 from api.key_processor import load_location_keys
 from utils.logging import log_api_interaction
 
-# Load the API key from the .env file
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
+# Load the API key from the .env file or the github actions secrets
+try:
+    load_dotenv()
+    API_KEY = os.getenv("API_KEY")
+except Exception as e:
+    API_KEY = os.environ("API_KEY")
+    error_message = f"Error loading API key: {str(e)}"
 
 
 def _12_hour_temperature_forecast(location_keys=load_location_keys()) -> dict:
