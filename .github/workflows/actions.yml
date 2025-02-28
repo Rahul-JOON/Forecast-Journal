@@ -36,5 +36,6 @@ jobs:
           DATABASE_URL_TRIAL: ${{ secrets.DATABASE_URL_TRIAL }}
           DATABASE_URL_FEBRUARY_2025: ${{ secrets.DATABASE_URL_FEBRUARY_2025 }}
           DATABASE_URL_MASTER: ${{ secrets.DATABASE_URL_MASTER }}
+          DATABASE_URL_MARCH_2025: ${{ secrets.DATABASE_URL_MARCH_2025 }}
         run: |
           python fetch_forecast.py
