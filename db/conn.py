@@ -13,7 +13,7 @@ try:
         os.getenv('DATABASE_URL_FEBRUARY_2025'),
         os.getenv('DATABASE_URL_MARCH_2025')
         )
-    db = [trial_db, dev_db, main_db, master_db, feb_2025_db]
+    db = [trial_db, dev_db, main_db, master_db, feb_2025_db, march_2025_db]
 except Exception as e:
     trial_db, dev_db, main_db, master_db, feb_2025_db, march_2025_db = (
         os.environ('DATABASE_URL_TRIAL'),
@@ -45,6 +45,7 @@ class ConnectionPool:
         Initializes the connection pool with the given connection string,
         minimum and maximum number of connections.
         """
+        print(db)
         connection_string = db[DB]
         self.connection_pool = pool.SimpleConnectionPool(
             min_conn,  # Minimum number of connections in the pool
