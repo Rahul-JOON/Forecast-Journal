@@ -5,17 +5,25 @@ from dotenv import load_dotenv
 # Load .env file to get the connection string or use the environment variable
 try:
     load_dotenv()
-    trial_db, dev_db, main_db, master_db, feb_2025_db = os.getenv(
-        'DATABASE_URL_TRIAL'), os.getenv(
-        'DATABASE_URL_DEVELOPMENT'), os.getenv('DATABASE_URL_MAIN'), os.getenv(
-        'DATABASE_URL_MASTER'), os.getenv('DATABASE_URL_FEBRUARY_2025')
-    db = [trial_db, dev_db, main_db, master_db, feb_2025_db]
+    trial_db, dev_db, main_db, master_db, feb_2025_db, march_2025_db = (
+        os.getenv('DATABASE_URL_TRIAL'),
+        os.getenv('DATABASE_URL_DEVELOPMENT'),
+        os.getenv('DATABASE_URL_MAIN'),
+        os.getenv('DATABASE_URL_MASTER'),
+        os.getenv('DATABASE_URL_FEBRUARY_2025'),
+        os.getenv('DATABASE_URL_MARCH_2025')
+        )
+    db = [trial_db, dev_db, main_db, master_db, feb_2025_db, march_2025_db]
 except Exception as e:
-    trial_db, dev_db, main_db, master_db, feb_2025_db = os.environ(
-        'DATABASE_URL_TRIAL'), os.environ('DATABASE_URL_DEVELOPMENT'),
-    os.environ('DATABASE_URL_MAIN'), os.environ('DATABASE_URL_MASTER'),
-    os.environ('DATABASE_URL_FEBRUARY_2025')
-    db = [trial_db, dev_db, main_db, master_db, feb_2025_db]
+    trial_db, dev_db, main_db, master_db, feb_2025_db, march_2025_db = (
+        os.environ('DATABASE_URL_TRIAL'),
+        os.environ('DATABASE_URL_DEVELOPMENT'),
+        os.environ('DATABASE_URL_MAIN'),
+        os.environ('DATABASE_URL_MASTER'),
+        os.environ('DATABASE_URL_FEBRUARY_2025'),
+        os.environ('DATABASE_URL_MARCH_2025')
+        )
+    db = [trial_db, dev_db, main_db, master_db, feb_2025_db, march_2025_db]
     error_message = f"Error loading database URL: {str(e)}"
 
 

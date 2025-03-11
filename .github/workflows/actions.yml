@@ -22,6 +22,11 @@ jobs:
         with:
           python-version: "3.9.13" # Specify the Python version you need
 
+      # Clear pip cache
+      - name: Clear pip cache
+        run: |
+          pip cache purge
+
       # Install dependencies (if required)
       - name: Install dependencies
         run: |
@@ -36,5 +41,6 @@ jobs:
           DATABASE_URL_TRIAL: ${{ secrets.DATABASE_URL_TRIAL }}
           DATABASE_URL_FEBRUARY_2025: ${{ secrets.DATABASE_URL_FEBRUARY_2025 }}
           DATABASE_URL_MASTER: ${{ secrets.DATABASE_URL_MASTER }}
+          DATABASE_URL_MARCH_2025: ${{ secrets.DATABASE_URL_MARCH_2025 }}
         run: |
           python fetch_forecast.py
