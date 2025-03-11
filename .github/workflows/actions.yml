@@ -22,6 +22,11 @@ jobs:
         with:
           python-version: "3.9.13" # Specify the Python version you need
 
+      # Clear pip cache
+      - name: Clear pip cache
+        run: |
+          pip cache purge
+
       # Install dependencies (if required)
       - name: Install dependencies
         run: |

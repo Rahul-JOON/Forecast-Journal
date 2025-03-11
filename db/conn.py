@@ -45,7 +45,6 @@ class ConnectionPool:
         Initializes the connection pool with the given connection string,
         minimum and maximum number of connections.
         """
-        print(db)
         connection_string = db[DB]
         self.connection_pool = pool.SimpleConnectionPool(
             min_conn,  # Minimum number of connections in the pool
