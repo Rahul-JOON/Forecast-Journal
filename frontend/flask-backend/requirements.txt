@@ -1,0 +1,15 @@
+# Flask dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# Database
+psycopg2-binary==2.9.10
+
+# Environment and utilities
+python-dotenv==1.0.1
+
+# Testing
+pytest==7.1.2
+
+# JSON handling
+simplejson==3.19.2
