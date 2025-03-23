@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Container from "@/components/layout/Container";
@@ -204,7 +203,7 @@ const Index = () => {
           </div>
           
           {/* Scroll indicator */}
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-float text-center">
+          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-float text-center hidden sm:flex sm:flex-col">
             <a href="#theory" className="flex flex-col items-center text-gray-400 hover:text-white transition-colors">
               <span className="text-sm mb-2">Scroll to explore</span>
               <ArrowDown size={20} />
@@ -320,10 +319,12 @@ const Index = () => {
                 title="Error Heatmap by Day &amp; Hour"
                 description="This heatmap visualizes forecast error patterns across different days of the week and hours of the day, helping identify when forecasts tend to be most and least accurate."
                 fullWidth
-                className="animate-fade-in-up mb-8"
+                className="animate-fade-in-up mb-8 overflow-x-auto"
                 style={{ animationDelay: '0.4s' }}
               >
-                <HeatmapChart data={heatmapData} />
+                <div className="min-w-[768px]">
+                  <HeatmapChart data={heatmapData} />
+                </div>
               </ChartCard>
             </>
           )}
@@ -376,7 +377,7 @@ const Index = () => {
         id="about"
         title="About Me"
         subtitle="The story and methodology behind Forecast Journal"
-        className="pb-32 h-screen flex items-center"
+        className="py-16 md:py-24 min-h-screen flex flex-col justify-center"
       >
         <Container>
           <div className="glass-morphism rounded-xl overflow-hidden animate-fade-in-up">

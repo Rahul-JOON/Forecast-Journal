@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Menu, X, CloudSun, BookOpen, Download, User, LayoutDashboard, Github, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -95,38 +94,40 @@ const Navbar: React.FC<NavbarProps> = ({ className, selectedCity = "New York" })
         </div>
 
         {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-[#121212]/95 backdrop-blur-lg pt-2 pb-4 glass-morphism animate-fade-in">
-            <div className="flex flex-col space-y-4 px-4">
-              <a
-                href="#theory"
-                className="text-gray-300 hover:text-primary-purple py-2 transition-colors duration-300 flex items-center gap-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <BookOpen size={18} />
-                <span>Theory</span>
-              </a>
-              <a
-                href="#about"
-                className="text-gray-300 hover:text-primary-purple py-2 transition-colors duration-300 flex items-center gap-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Download size={18} />
-                <span>Download</span>
-              </a>
-              <button 
-                onClick={() => {
-                  handleDashboardClick();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-opacity text-sm font-medium"
-              >
-                <LayoutDashboard size={16} className="mr-2" />
-                {selectedCity} Dashboard
-              </button>
-            </div>
+        <div 
+          className={`md:hidden absolute top-full left-0 right-0 bg-[#121212] border-b border-white/10 shadow-xl z-50 pt-2 pb-4 animate-fade-in ${
+            isMobileMenuOpen ? 'block' : 'hidden'
+          }`}
+        >
+          <div className="flex flex-col space-y-4 px-4">
+            <a
+              href="#theory"
+              className="text-gray-300 hover:text-primary-purple py-2 transition-colors duration-300 flex items-center gap-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <BookOpen size={18} />
+              <span>Theory</span>
+            </a>
+            <a
+              href="#about"
+              className="text-gray-300 hover:text-primary-purple py-2 transition-colors duration-300 flex items-center gap-2"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Download size={18} />
+              <span>Download</span>
+            </a>
+            <button 
+              onClick={() => {
+                handleDashboardClick();
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-opacity text-sm font-medium"
+            >
+              <LayoutDashboard size={16} className="mr-2" />
+              {selectedCity} Dashboard
+            </button>
           </div>
-        )}
+        </div>
       </nav>
     </header>
   );
