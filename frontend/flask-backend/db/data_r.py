@@ -6,7 +6,7 @@ The default database is the trial database i.e. DB=0
 To use the development or main database, change the value of DB;
 DB=1 dev_database and DB=2 main database.
 """
-cpool = ConnectionPool(DB=4)
+cpool = ConnectionPool(DB=3)
 
 
 def row_existence_check(table_name, column_name, value) -> bool:
