@@ -6,7 +6,7 @@ The default database is the trial database i.e. DB=0
 To use the development or main database, change the value of DB;
 DB=1 dev_database and DB=2 main database.
 """
-cpool = ConnectionPool(DB=5)
+cpool = ConnectionPool(DB=3)  # master database
 
 
 def insert_data(table_name, data) -> bool:
