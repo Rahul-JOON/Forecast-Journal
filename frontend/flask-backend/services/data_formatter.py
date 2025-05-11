@@ -1,5 +1,7 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from io import StringIO
+import csv
 
 
 def convert_db_data_to_frontend_json(forecast_tuples):
@@ -40,6 +42,36 @@ def convert_db_data_to_frontend_json(forecast_tuples):
 
     return forecast_dicts
 
+def convert_db_data_to_csv_download(forecast_tuples):
+    """
+    Convert a list of forecast data tuples to a CSV format.
+
+    Args:
+        forecast_tuples: List of tuples containing forecast data with fields:
+            (id, location_id, forecast_for_hour, forecast_made_at, temperature)
+
+    Returns:
+        CSV string representation of the data
+    """
+    # Define column names for the tuple data
+    columns = [
+        "id", "location_id", "forecast_for_hour",
+        "forecast_made_at", "temperature"
+    ]
+
+    # convert datetime objects to strings in ISO format
+    # and add 5:30 hours to forecast_made_at(utc+0) to get IST(utc+5:30)
+    for i in range(len(forecast_tuples)):
+        forecast_tuples[i] = list(forecast_tuples[i])
+        forecast_tuples[i][2] = forecast_tuples[i][2].isoformat()
+        forecast_tuples[i][3] = (forecast_tuples[i][3] + timedelta(hours=5, minutes=30)).isoformat()
+
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(columns)             # Write header row
+    writer.writerows(forecast_tuples)    # Write data rows
+    # print(f"CSV data: {output.getvalue()}")  # Debugging statement
+    return output.getvalue()
 
 # Example usage
 if __name__ == "__main__":
