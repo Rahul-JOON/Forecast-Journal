@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, CloudSun, BookOpen, Download, User, LayoutDashboard, Github, Linkedin } from "lucide-react";
+import { Menu, X, CloudSun, BookOpen, Download, User, LayoutDashboard, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavbarProps {
@@ -10,15 +10,26 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ className, selectedCity = "New York" }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasViewedDashboard, setHasViewedDashboard] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
+      
+      // Check if user has scrolled through the dashboard section
+      const trendsSection = document.getElementById('trends');
+      if (trendsSection) {
+        const trendsSectionBottom = trendsSection.getBoundingClientRect().bottom;
+        // Consider dashboard viewed if user has scrolled past 70% of the trends section
+        if (trendsSectionBottom < window.innerHeight * 0.3 && !hasViewedDashboard) {
+          setHasViewedDashboard(true);
+        }
+      }
     };
     
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [hasViewedDashboard]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -36,9 +47,36 @@ const Navbar: React.FC<NavbarProps> = ({ className, selectedCity = "New York" })
           citySelector.focus();
           citySelector.click(); // Open the dropdown
         }
+        
+        // Set hasViewedDashboard to true after user clicks the dashboard button
+        setHasViewedDashboard(true);
       }, 800);
     }
   };
+
+  // Define the ML Insights button
+  const MLInsightsButton = () => (
+    <a
+      href="https://github.com/Rahul-JOON/TempCastRNN"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-all duration-300 hover:scale-105 text-sm font-medium group"
+    >
+      <Github size={16} className="mr-2 group-hover:animate-pulse" />
+      <span>ML Model Insights</span>
+    </a>
+  );
+
+  // Define the Dashboard button
+  const DashboardButton = () => (
+    <button 
+      onClick={handleDashboardClick}
+      className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-opacity text-sm font-medium"
+    >
+      <LayoutDashboard size={16} className="mr-2" />
+      {selectedCity} Dashboard
+    </button>
+  );
 
   return (
     <header className={cn(
@@ -72,13 +110,11 @@ const Navbar: React.FC<NavbarProps> = ({ className, selectedCity = "New York" })
               <Download size={18} />
               <span>Download</span>
             </a>
-            <button 
-              onClick={handleDashboardClick}
-              className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-opacity text-sm font-medium"
-            >
-              <LayoutDashboard size={16} className="mr-2" />
-              {selectedCity} Dashboard
-            </button>
+            
+            {/* Dynamically show Dashboard or ML Insights button */}
+            <div className="transition-all duration-300">
+              {hasViewedDashboard ? <MLInsightsButton /> : <DashboardButton />}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -116,16 +152,31 @@ const Navbar: React.FC<NavbarProps> = ({ className, selectedCity = "New York" })
               <Download size={18} />
               <span>Download</span>
             </a>
-            <button 
-              onClick={() => {
-                handleDashboardClick();
-                setIsMobileMenuOpen(false);
-              }}
-              className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-opacity text-sm font-medium"
-            >
-              <LayoutDashboard size={16} className="mr-2" />
-              {selectedCity} Dashboard
-            </button>
+            
+            {/* Mobile: Dynamically show Dashboard or ML Insights button */}
+            {hasViewedDashboard ? (
+              <a
+                href="https://github.com/Rahul-JOON/TempCastRNN"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-all text-sm font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Github size={16} className="mr-2" />
+                <span>ML Model Insights</span>
+              </a>
+            ) : (
+              <button 
+                onClick={() => {
+                  handleDashboardClick();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center justify-center h-9 px-4 py-2 rounded-md bg-gradient-to-r from-primary-purple to-primary-blue text-white hover:opacity-90 transition-opacity text-sm font-medium"
+              >
+                <LayoutDashboard size={16} className="mr-2" />
+                {selectedCity} Dashboard
+              </button>
+            )}
           </div>
         </div>
       </nav>

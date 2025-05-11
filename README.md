@@ -26,6 +26,7 @@ With the newly implemented **frontend dashboard**, users can now **visualize tre
 ✅ **Logging System**: Tracks API and database transactions in a structured format.  
 ✅ **Frontend Dashboard**: Visual representation of forecast accuracy trends.  
 ✅ **Downloadable Data**: Users can retrieve historical forecast accuracy data.  
+✅ **ML Prediction Model**: Refines temperature forecasts using temporal patterns.
 
 ---
 
@@ -41,11 +42,23 @@ The frontend, built with **React + TypeScript**, provides interactive data visua
 
 ---
 
+## 🤖 ML Model Integration  
+The ML model has been implemented at [TempCastRNN](https://github.com/Rahul-JOON/TempCastRNN), a transformer-based time series model that:
+
+- 📊 **Processes 12×12 forecast matrices** leveraging data from Forecast Journal.
+- 📈 **Uses temporal attention** to learn patterns in forecast changes over time.
+- 🔄 **Corrects inaccuracies** in 12-hour forecasts with low average error (~1.7°C).
+- 🧠 **Implements causal masking** to ensure predictions use only available data.
+- 📉 **Demonstrates improved accuracy** through time-aware deep learning techniques.
+
+Recent evaluation shows the model achieves an MAE of 1.698°C and RMSE of 2.017°C, effectively refining traditional weather forecasts.
+
+---
+
 ## 🔮 Future Vision  
-The next step is **implementing an ML model** to refine predictions. The model will:
-- 📊 **Train on past data monthly** to improve future forecasts.
-- 📈 **Learn temporal patterns** to adjust inaccuracies dynamically.
-- 🔄 **Continuously update** based on the latest 30-day data.
+The next step is **improving the ML model** to refine predictions further. The goal is to:
+- Collect more data points for training.
+- Enhance the model's architecture for better accuracy.
 
 ---
 
