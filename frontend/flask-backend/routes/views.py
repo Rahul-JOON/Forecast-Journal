@@ -27,7 +27,7 @@ def home():
         return jsonify(convert_db_data_to_frontend_json(temperature_data))
 
     except Exception as e:
-        print(f"Exception occurred: {str(e)}")  # Debugging statement
+        # print(f"Exception occurred: {str(e)}")  # Debugging statement
         return f"<p>{str(e)}<p>"
 
 
@@ -41,11 +41,16 @@ def download():
     data = get_date_range_temperature_data_by_city(city, start_date, end_date)
     # print(data)
 
-    if data:
-        csv_data = convert_db_data_to_csv_download(data)
-        response = make_response(csv_data)
-        response.headers["Content-Disposition"] = "attachment; filename=data.csv"
-        response.headers["Content-Type"] = "text/csv"
-        return response
-    else:
-        return "No data found in the database."
+    try:
+        if data:
+            csv_data = convert_db_data_to_csv_download(data)
+            response = make_response(csv_data)
+            response.headers["Content-Disposition"] = "attachment; filename=data.csv"
+            response.headers["Content-Type"] = "text/csv"
+            return response
+        else:
+            return "No data found in the database."
+        
+    except Exception as e:
+        # print(f"Exception occurred: {str(e)}")  # Debugging statement
+        return f"<p>{str(e)}<p>"
