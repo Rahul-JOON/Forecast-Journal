@@ -1,0 +1,6 @@
+Inactive repository's github actions are turned off automatically after 6 months.
+
+Pushing mock commits in order to keep cron jobs active
+
+logs:
+04-07-2025
